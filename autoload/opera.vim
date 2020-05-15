@@ -4,6 +4,9 @@
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-opera
 
+let s:save_cpo = &cpo
+set cpo&vim
+
 " opera#block({cmd} [, {mods}])
 " apply any :h :range command to text selection
 " Note: {cmd} is applied to the contents of unnamed register;
@@ -64,9 +67,12 @@ function! opera#mapto(cmd, ...) abort
 
     " Visual mode
     if mode() is# 'V' || l:linewise
-        return printf(":\<C-U>%s'<,'>%s\<CR>", l:mods, a:cmd)
+        return printf("\<Esc>:%s'<,'>%s\<CR>", l:mods, a:cmd)
     else
         return printf("\"9y:call opera#block(%s, %s)\<CR>",
             \ string(a:cmd), string(l:mods))
     endif
 endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
