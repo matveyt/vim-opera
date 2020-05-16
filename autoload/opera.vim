@@ -1,6 +1,6 @@
 " Vim plugin to apply an Ex command to selection or g@ operator
 " Maintainer:   matveyt
-" Last Change:  2020 May 15
+" Last Change:  2020 May 16
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-opera
 
@@ -56,8 +56,12 @@ function! opera#mapto(cmd, ...) abort
             if a:type is# 'line' || l:linewise
                 execute l:mods "'[,']" a:cmd
             else
-                normal! g`[vg`]"9y
+                " Note: &sel=exclusive doesn't seem to work for two yanks,
+                " as Vim shifts `] mark one position left. Vim bug?
+                let [&sel, l:oldsel] = ['inclusive', &sel]
+                normal! `[v`]"9y
                 call opera#block(a:cmd, l:mods)
+                let &sel = l:oldsel
             endif
         endfunction
         " set opfunc and return 'g@' to be used by map-<expr>
