@@ -8,9 +8,8 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 " opera#block({cmd} [, {mods}])
-" apply any :h :range command to text selection
-" Note: {cmd} is applied to the contents of unnamed register;
-" the result replaces text between `[ and `]
+" apply any :h :range command to the contents of unnamed register
+" Note: the result will be put between `[ and `] marks
 function! opera#block(cmd, ...) abort
     let l:start = getpos("'[")
     let l:end = getpos("']")
@@ -24,10 +23,12 @@ function! opera#block(cmd, ...) abort
         let l:corr = '$'
         if stridx(&ve, 'all') >= 0 || stridx(&ve, 'block') >= 0
             " trim trailing spaces
+            " Note: this isn't always correct, yet this is the best we can do
             call map(l:regcontents, {_, v -> substitute(v, '\s\+$', '', '')})
         endif
     endif
 
+    " append text & execute a:cmd & get result into reg 9
     call append(l:last, l:regcontents)
     try
         execute get(a:, 1, '') l:last..'+,$' a:cmd
@@ -36,8 +37,10 @@ function! opera#block(cmd, ...) abort
         call deletebufline('%', l:last + 1, '$')
     endtry
 
+    " restore marks in case they were changed by a:cmd
     call setpos("'[", l:start)
     call setpos("']", l:end)
+
     " Note: l:corr must be the last, because it can fail
     execute 'normal! g`['..l:vmode..'g`]'..l:corr
     silent normal! "9p
@@ -59,7 +62,7 @@ function! opera#mapto(cmd, ...) abort
                 " Note: &sel=exclusive doesn't seem to work for two yanks,
                 " as Vim shifts `] mark one position left. Vim bug?
                 let [&sel, l:oldsel] = ['inclusive', &sel]
-                normal! `[v`]"9y
+                normal! g`[vg`]"9y
                 call opera#block(a:cmd, l:mods)
                 let &sel = l:oldsel
             endif
