@@ -1,6 +1,6 @@
 " Vim plugin to apply an Ex command to selection or g@ operator
 " Maintainer:   matveyt
-" Last Change:  2020 May 16
+" Last Change:  2020 May 17
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-opera
 
@@ -11,10 +11,9 @@ set cpo&vim
 " apply any :h :range command to the contents of unnamed register
 " Note: the result will be put between `[ and `] marks
 function! opera#block(cmd, ...) abort
-    let l:start = getpos("'[")
-    let l:end = getpos("']")
+    let l:mods = get(a:, 1, '')
     let l:last = line('$')
-    let l:corr = &selection is# 'exclusive' ? 'l' : ''
+    let l:corr = &sel is# 'exclusive' ? 'l' : ''
 
     let l:regcontents = getreg('', 1, 1)
     let l:regtype = getregtype('')
@@ -31,15 +30,11 @@ function! opera#block(cmd, ...) abort
     " append text & execute a:cmd & get result into reg 9
     call append(l:last, l:regcontents)
     try
-        execute get(a:, 1, '') l:last..'+,$' a:cmd
+        execute 'lockmarks' l:mods l:last..'+,$' a:cmd
         call setreg(9, getline(l:last + 1, '$'), l:vmode)
     finally
         call deletebufline('%', l:last + 1, '$')
     endtry
-
-    " restore marks in case they were changed by a:cmd
-    call setpos("'[", l:start)
-    call setpos("']", l:end)
 
     " Note: l:corr must be the last, because it can fail
     execute 'normal! g`['..l:vmode..'g`]'..l:corr
@@ -50,7 +45,13 @@ endfunction
 " automatic g@ operator mapping
 function! opera#mapto(cmd, ...) abort
     let l:mods = get(a:, 1, '')
-    let l:linewise = stridx(l:mods, 'bro') >= 0
+    let l:pos = stridx(l:mods, 'line')
+    if l:pos < 0
+        let l:linewise = v:false
+    else
+        let l:linewise = v:true
+        let l:mods = strpart(l:mods, 0, l:pos) . strpart(l:mods, l:pos + 4)
+    endif
 
     " Normal mode
     if mode() is# 'n'
@@ -59,8 +60,6 @@ function! opera#mapto(cmd, ...) abort
             if a:type is# 'line' || l:linewise
                 execute l:mods "'[,']" a:cmd
             else
-                " Note: &sel=exclusive doesn't seem to work for two yanks,
-                " as Vim shifts `] mark one position left. Vim bug?
                 let [&sel, l:oldsel] = ['inclusive', &sel]
                 normal! g`[vg`]"9y
                 call opera#block(a:cmd, l:mods)
