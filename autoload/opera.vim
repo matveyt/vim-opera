@@ -1,6 +1,6 @@
 " Vim plugin to apply an Ex command to selection or g@ operator
 " Maintainer:   matveyt
-" Last Change:  2020 May 17
+" Last Change:  2020 Nov 25
 " License:      VIM License
 " URL:          https://github.com/matveyt/vim-opera
 
@@ -61,7 +61,7 @@ function! opera#mapto(cmd, ...) abort
                 execute l:mods "'[,']" a:cmd
             else
                 let [&sel, l:oldsel] = ['inclusive', &sel]
-                normal! g`[vg`]"9y
+                silent normal! g`[vg`]"9y
                 call opera#block(a:cmd, l:mods)
                 let &sel = l:oldsel
             endif
