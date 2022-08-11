@@ -1,25 +1,25 @@
-*opera.txt*     Ex commands for arbitrary selections and motions
+*opera.txt*	Ex commands for arbitrary selections and motions
 
 ==============================================================================
-OVERVIEW                                                               *opera*
+OVERVIEW							       *opera*
 
 |Opera| allows to use |:range| commands with non-linewise motions and
 selections.
 
 ==============================================================================
-COMMANDS                                                      *opera-commands*
+COMMANDS						      *opera-commands*
 
-:[range]B {cmd}                                                           *:B*
+:[range]B {cmd}								  *:B*
 
-  Correctly applies {cmd} to the last Visual selection even if it's
+  Correctly applies {cmd} to a last Visual selection even if it's
   |characterwise-visual| or |blockwise-visual|. For example, >
     :'<,'>B sort
 <
-  Note [range] is silently dropped to save `<C-U>` keystroke, as |B| works
-  over Visual selection only.
+  Note: [range] is silently dropped to save `<C-U>` key press, as |B| works
+  over a Visual selection only.
 
 ==============================================================================
-MAPPINGS                                                      *opera-mappings*
+MAPPINGS						      *opera-mappings*
 
 Use |opera#mapto()| to create |g@| mappings easily. For example, >
 
@@ -29,23 +29,23 @@ Use |opera#mapto()| to create |g@| mappings easily. For example, >
     nnoremap <silent>gss :sort<CR>
 <
 ==============================================================================
-FUNCTIONS                                                    *opera-functions*
+FUNCTIONS						     *opera-functions*
 
-                                                               *opera#block()*
+							       *opera#block()*
 opera#block({cmd} [, {mods}])
     Apply {cmd} to the unnamed register |quotequote|. The result will replace
-    the text between `'[` and `']`. Note the function is supposed to be called
-    right after a yank operation.
+    the text between `'[` and `']`. Note that the function is supposed to be
+    called right after yank operation.
 
     {mods} is used to specify optional |:command-modifiers|.
 
-                                                               *opera#mapto()*
+							       *opera#mapto()*
 opera#mapto({cmd} [, {mods}])
-    Used as rhs in |:map-<expr>| for any |Visual-mode| or Normal mode
+    Use as rhs in |:map-<expr>| for any |Visual-mode| or Normal mode
     |:map-operator|.
 
     {cmd} is an arbitrary command. {mods} is optional |:command-modifiers|.
-    Note if {mods} contains "line" then selection is forced linewise.
+    Note: if {mods} contains "line" then selection is forced linewise.
 
 ==============================================================================
  vim:tw=78:ts=8:noet:ft=help:norl:

@@ -3,9 +3,11 @@
 This plugin allows to use any `:h :range` commands with non-linewise motions and
 selections.
 
-### Download and Install
+#### Download and Install
 
-Use whatever plugin manager to pull the master branch.
+```
+$ git clone https://github.com/matveyt/vim-opera ~/.vim/pack/manual/start/vim-opera
+```
 
 ### Usage
 
@@ -17,8 +19,4 @@ Use whatever plugin manager to pull the master branch.
     " apply :sort to arbitrary selection
     :'<,'>B sort
 
-Read `:help opera`.
-
-### License
-
-Distributed under the same terms as Vim itself. See `:help license`.
+See `:help opera.txt`.
